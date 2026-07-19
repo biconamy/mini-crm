@@ -9,6 +9,7 @@ from mini_crm.models import Note, ProjectState, Task
 from mini_crm.cli import demo_state
 from mini_crm.storage import load_state, save_state
 from mini_crm.models import generate_short_id
+from mini_crm.validation import normalize_tags, require_text, validate_task_status
 
 
 class ProjectSmokeTests(unittest.TestCase):
@@ -49,6 +50,13 @@ class ProjectSmokeTests(unittest.TestCase):
         generated = generate_short_id("note", size=6)
 
         self.assertTrue(generated.startswith("note-"))
+
+    def test_validation_helpers(self) -> None:
+        self.assertEqual(normalize_tags([" Work ", "work", "Bug"]), ["work", "bug"])
+        self.assertEqual(require_text(" Title ", "title"), "Title")
+        self.assertEqual(validate_task_status("todo"), "todo")
+        with self.assertRaises(ValueError):
+            require_text(" ", "title")
 
 
 if __name__ == "__main__":
